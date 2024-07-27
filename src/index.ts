@@ -1,10 +1,27 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Application } from 'express';
+import { routes } from './routes';
+import { logger } from './utils/logger';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+// connect DB
+import './utils/db';
 
-const app = express();
+const app: Application = express();
 const port = 4000;
 
-app.use('/', (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).send({ data: 'Hello min' });
+// parse body request
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// cors access handler
+app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Controll-Allow-Methods', '*');
+  res.setHeader('Access-Controll-Allow-Headers', '*');
+  next();
 });
 
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+routes(app);
+
+app.listen(port, () => logger.info(`Server is running on port ${port}`));
