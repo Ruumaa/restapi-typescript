@@ -6,6 +6,7 @@ import {
 import { logger } from '../utils/logger';
 import {
   addProductDB,
+  deleteProductDB,
   getProductById,
   getProductDB,
   updateProductDB,
@@ -88,7 +89,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
   const { value, error } = updateProductValidation(req.body);
   if (error) {
-    logger.error(`product - create = ${error.details[0].message}`);
+    logger.error(`product - update = ${error.details[0].message}`);
     return res.status(422).send({
       status: false,
       statusCode: 422,
@@ -114,5 +115,45 @@ export const updateProduct = async (req: Request, res: Response) => {
       statusCode: 200,
       message: 'Update product success',
     });
-  } catch (error) {}
+  } catch (error) {
+    logger.error(`product - update = ${error}`);
+    return res.status(422).send({
+      status: false,
+      statusCode: 422,
+      message: error,
+    });
+  }
+};
+
+export const deleteProduct = async (req: Request, res: Response) => {
+  const {
+    params: { id },
+  } = req;
+
+  const product = await getProductById(id);
+  if (!product) {
+    logger.info(`Product ${id} not found!`);
+    return res.status(404).send({
+      status: false,
+      statusCode: 404,
+      data: {},
+    });
+  }
+
+  try {
+    await deleteProductDB(id);
+    logger.info('Success delete product!');
+    return res.status(200).send({
+      status: true,
+      statusCode: 200,
+      message: 'Delete product success',
+    });
+  } catch (error) {
+    logger.error(`product - delete = ${error}`);
+    return res.status(422).send({
+      status: false,
+      statusCode: 422,
+      message: error,
+    });
+  }
 };

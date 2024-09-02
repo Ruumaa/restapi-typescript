@@ -25,3 +25,7 @@ export const updateProductDB = async (id: string, payload: ProductType) => {
     { $set: payload }
   );
 };
+
+export const deleteProductDB = async (id: string) => {
+  return await productModel.findOneAndDelete({ product_id: id });
+};
